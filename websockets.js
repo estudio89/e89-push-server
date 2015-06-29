@@ -3,7 +3,7 @@ function init(server, app) {
 
 	// Send websocket push
 	var clients = {};
-	app.post('/send/ws/', function(req, res){
+	app.post('/push/send/ws/', function(req, res){
 		var identifiers = req.body["identifiers"];
 		var notFound = [];
 		if (Object.prototype.toString.call( identifiers ) === '[object Array]') {

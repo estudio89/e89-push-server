@@ -4,7 +4,7 @@ function init(app) {
 	var currentKeyFile;
 	var currentCertFile;
 
-	app.post("/send/apns/", function(req, res){
+	app.post("/push/send/apns/", function(req, res){
 		var identifiers = req.body.identifiers;
 		var keyFile = req.body.keyFile;
 		var certFile = req.body.certFile;

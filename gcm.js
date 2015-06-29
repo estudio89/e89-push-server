@@ -3,7 +3,7 @@ function init(app) {
 	var sender;
 	var currentApiKey;
 
-	app.post("/send/gcm/", function(req, res){
+	app.post("/push/send/gcm/", function(req, res){
 		var identifiers = req.body.identifiers;
 		var apiKey = req.body.apiKey;
 		var collapseKey = req.body.collapseKey;
