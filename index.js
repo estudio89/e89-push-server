@@ -1,25 +1,31 @@
+// Requirements
 var express = require('express');
 var bodyParser = require('body-parser');
 
+
+// App initialization
 var app = express();
-
 var jsonParser = bodyParser.json();
+app.use(jsonParser);
 
+// Server and sockets
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-
-var clients = {};
 
 server.listen(8081, function(){
   console.log('listening on *:8081');
 });
 
+
+// Routes
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
-app.post('/send/', jsonParser, function(req, res){
+var clients = {};
+app.post('/send/', function(req, res){
 	var identifiers = req.body["identifiers"];
+	var notFound = [];
 	if (Object.prototype.toString.call( identifiers ) === '[object Array]') {
 
 		var eventType = req.body["type"];
@@ -28,29 +34,51 @@ app.post('/send/', jsonParser, function(req, res){
 
 		console.log("Send received - identifiers: " + identifiers + " - event: " + eventType);
 		identifiers.forEach(function(identifier, idx){
-			var socket = clients[identifier];
-			if (typeof socket !== "undefined") {
-				socket.emit(eventType, req.body);
+			var allSockets = clients[identifier];
+			if (typeof allSockets === "undefined") {
+				notFound.push(identifier);
+				return;
 			}
+			var deviceIds = Object.keys(allSockets)
+			deviceIds.forEach(function(deviceId){
+				var socket = allSockets[deviceId];
+				if (typeof socket !== "undefined") {
+					socket.emit(eventType, req.body);
+				} else {
+					notFound.push(identifier);
+				}
+			});
 		});
 	}
 
-	res.send("ok");
+	res.json({"notFound":notFound});
 });
 
-
+// Socket handling
 io.on('connection', function(socket){
   console.log('a user connected');
   var identifier;
+  var deviceId;
 
   socket.on('register', function(data){
-  	console.log("registered user with identifier: " + data);
-  	identifier = data;
-  	clients[identifier] = socket;
+  	identifier = data.identifier;
+  	deviceId = data.deviceId;
+  	console.log("registered user with identifier: " + identifier);
+  	if (typeof clients[identifier] === "undefined") {
+  		clients[identifier] = {};
+  	}
+  	clients[identifier][deviceId] = socket;
   });
 
   socket.on('disconnect', function(){
-    delete clients[identifier];
+  	console.log("user with identifier " + identifier + " and deviceId " + deviceId + " disconnected.");
+  	if (typeof clients[identifier] !== "undefined") {
+    	delete clients[identifier][deviceId];
+    	var deviceIds = Object.keys(clients[identifier]);
+    	if (deviceIds.length == 0) {
+    		delete clients[identifier];
+    	}
+  	}
   });
 
 });

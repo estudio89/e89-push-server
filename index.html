@@ -23,7 +23,7 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io();
-      socket.emit('register', "teste");
+      socket.emit('register', {identifier: "teste", deviceId:"myid"});
       $('form').submit(function(){
         socket.emit('chat message', $('#m').val());
         $('#m').val('');
