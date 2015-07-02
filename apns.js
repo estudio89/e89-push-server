@@ -33,6 +33,7 @@ function init(app) {
 		// Notification object
 		var note = new apn.Notification();
 		note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+		note.contentAvailable = 1;
 		["payload", "badge", "sound", "alert"].forEach(function(attr){
 			note[attr] = req.body[attr];
 		});
