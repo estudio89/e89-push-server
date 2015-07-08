@@ -11,23 +11,9 @@ function init(app) {
 		var collapseKey = req.body.collapseKey;
 		var payload = req.body.payload;
 
-		if (typeof payload["type"] !== "undefined" && typeof websockets.clients["android"] !== "undefined") {
-			// Trying to send by websocket
-			var notFound = [];
-			identifiers.forEach(function(identifier, idx) {
-				var socket = websockets.clients["android"][identifier];
-				if (typeof socket !== "undefined") {
-					// User is connected
-					socket.emit(payload["type"], payload);
-					console.log("Sent event of type " + payload["type"] + " to Android user connected to websocket.");
-				} else {
-					notFound.push(identifier);
-				}
-			});
-		}
+		var notFound = websockets.sendToMobileDevice("android", identifiers, payload);
 
-		if (notFound.length === 0) {
-			// All users were connected to the websocket
+		if (notFound.length === 0) { // All users were connected to the websocket
 			res.json({ok:true});
 			return;
 		}
@@ -42,7 +28,7 @@ function init(app) {
 			"data": payload
 		});
 
-		sender.send(message, identifiers);
+		sender.send(message, notFound);
 		res.json({ok:true});
 	});
 }

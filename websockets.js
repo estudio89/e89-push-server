@@ -63,7 +63,27 @@ function init(server, app) {
 	});
 }
 
+function sendToMobileDevice(platform, identifiers, payload) {
+	var notFound = [];
+	if (typeof payload["type"] !== "undefined" && typeof clients[platform] !== "undefined") {
+		identifiers.forEach(function(identifier, idx) {
+			var socket = clients[platform][identifier];
+			if (typeof socket !== "undefined") {
+				// User is connected
+				socket.emit(payload["type"], payload);
+				console.log("Sent event of type " + payload["type"] + " to user of platform " + platform + " connected to websocket.");
+			} else {
+				notFound.push(identifier);
+			}
+		});
+	} else {
+		notFound = identifiers;
+	}
+
+	return notFound;
+}
+
 module.exports = {
 	"init":init,
-	"clients":clients
+	"sendToMobileDevice":sendToMobileDevice
 }

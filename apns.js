@@ -1,5 +1,6 @@
 function init(app) {
 	var apn = require('apn');
+	var websockets = require('./websockets.js');
 	var apnConnection;
 	var currentKeyFile;
 	var currentCertFile;
@@ -9,6 +10,14 @@ function init(app) {
 		var keyFile = req.body.keyFile;
 		var certFile = req.body.certFile;
 		var production = req.body.production;
+		var payload = req.body.payload;
+
+		var notFound = websockets.sendToMobileDevice("ios", identifiers, payload);
+
+		if (notFound.length === 0) { // All users were connected to the websocket
+			res.json({ok:true});
+			return;
+		}
 
 		if (keyFile !== currentKeyFile || certFile !== currentCertFile || typeof apnConnection === "undefined") {
 			if (typeof apnConnection !== "undefined") {
