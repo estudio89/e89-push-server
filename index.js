@@ -14,7 +14,7 @@ server.listen(8081, function(){
 });
 
 // Initializing libraries
-require('./websockets.js')(server, app);
+require('./websockets.js').init(server, app);
 require('./apns.js')(app);
 require('./gcm.js')(app);
 

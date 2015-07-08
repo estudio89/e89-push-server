@@ -1,8 +1,8 @@
+var clients = {};
 function init(server, app) {
 	var io = require('socket.io')(server);
 
 	// Send websocket push
-	var clients = {};
 	app.post('/push/send/ws/', function(req, res){
 		var identifiers = req.body["identifiers"];
 		var notFound = [];
@@ -43,7 +43,7 @@ function init(server, app) {
 		socket.on('register', function(data){
 			identifier = data.identifier;
 			deviceId = data.deviceId;
-			console.log("registered user with identifier: " + identifier);
+			console.log("registered user with identifier " + identifier + " and deviceId " + deviceId);
 			if (typeof clients[identifier] === "undefined") {
 				clients[identifier] = {};
 			}
@@ -63,4 +63,7 @@ function init(server, app) {
 	});
 }
 
-module.exports = init;
+module.exports = {
+	"init":init,
+	"clients":clients
+}
