@@ -12,6 +12,9 @@ function init(app) {
 		var production = req.body.production;
 		var payload = req.body.payload;
 
+		// Setting timestamp
+		payload["timestamp"] = new Date().getTime();
+
 		var notFound = websockets.sendToMobileDevice("ios", identifiers, payload);
 
 		if (notFound.length === 0) { // All users were connected to the websocket

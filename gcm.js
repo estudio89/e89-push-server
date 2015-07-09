@@ -11,6 +11,9 @@ function init(app) {
 		var collapseKey = req.body.collapseKey;
 		var payload = req.body.payload;
 
+		// Setting timestamp
+		payload["timestamp"] = new Date().getTime() + "";
+
 		var notFound = websockets.sendToMobileDevice("android", identifiers, payload);
 
 		if (notFound.length === 0) { // All users were connected to the websocket
