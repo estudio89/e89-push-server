@@ -1,3 +1,5 @@
+var VERSION = "1.0.0";
+
 // Requirements
 var express = require('express');
 var bodyParser = require('body-parser');
