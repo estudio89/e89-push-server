@@ -12,7 +12,7 @@ function init(server, app) {
 			delete req.body["identifiers"];
 			delete req.body["type"];
 
-			console.log("Send received - identifiers: " + identifiers + " - event: " + eventType);
+			console.log("WEBSOCKET: [DATA RECEIVED] = " + JSON.stringify(req.body));
 			identifiers.forEach(function(identifier, idx){
 				var allSockets = clients[identifier];
 				if (typeof allSockets === "undefined") {
@@ -71,7 +71,7 @@ function sendToMobileDevice(platform, identifiers, payload) {
 			if (typeof socket !== "undefined") {
 				// User is connected
 				socket.emit(payload["type"], payload);
-				console.log("Sent event of type " + payload["type"] + " to user of platform " + platform + " connected to websocket.");
+				console.log("Sent event of type " + payload["type"] + " to user with identifier" + identifier + "of platform " + platform + " connected to websocket.");
 			} else {
 				notFound.push(identifier);
 			}

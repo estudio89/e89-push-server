@@ -15,12 +15,9 @@ function init(app) {
 		// Setting timestamp
 		payload["timestamp"] = new Date().getTime();
 
-		var notFound = websockets.sendToMobileDevice("ios", identifiers, payload);
+		console.log("APNS: [DATA RECEIVED] = " + JSON.stringify(req.body));
 
-		if (notFound.length === 0) { // All users were connected to the websocket
-			res.json({ok:true});
-			return;
-		}
+		var notFound = websockets.sendToMobileDevice("ios", identifiers, payload);
 
 		if (keyFile !== currentKeyFile || certFile !== currentCertFile || typeof apnConnection === "undefined") {
 			if (typeof apnConnection !== "undefined") {
