@@ -14,12 +14,9 @@ function init(app) {
 		// Setting timestamp
 		payload["timestamp"] = new Date().getTime() + "";
 
-		var notFound = websockets.sendToMobileDevice("android", identifiers, payload);
+		console.log("GCM: [DATA RECEIVED] = " + JSON.stringify(req.body));
 
-		if (notFound.length === 0) { // All users were connected to the websocket
-			res.json({ok:true});
-			return;
-		}
+		var notFound = websockets.sendToMobileDevice("android", identifiers, payload);
 
 		if (apiKey !== currentApiKey || typeof sender == "undefined") {
 			currentApiKey = apiKey;
@@ -31,7 +28,8 @@ function init(app) {
 			"data": payload
 		});
 
-		sender.send(message, notFound);
+		sender.send(message, identifiers);
+		console.log("GCM: sent push to " + identifiers);
 		res.json({ok:true});
 	});
 }
