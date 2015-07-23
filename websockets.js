@@ -50,6 +50,34 @@ function init(server, app) {
 			clients[identifier][deviceId] = socket;
 		});
 
+		socket.on('joinRoom', function(roomName) {
+			if (typeof socket.room !== "undefined") {
+				socket.leave(socket.room);
+			}
+			socket.room = roomName;
+			socket.join(roomName);
+		});
+
+		socket.on('leaveRoom', function() {
+			if (typeof socket.room === "undefined") {
+				return;
+			}
+
+			socket.leave(socket.room);
+			socket.room = undefined;
+		});
+
+		socket.on('sendToRoom', function(data) {
+			if (typeof socket.room === "undefined") {
+				return;
+			}
+
+			var eventName = data.eventName;
+			var eventData = data.eventData;
+			socket.broadcast.to(socket.room).emit(eventName, eventData);
+
+		});
+
 		socket.on('disconnect', function(){
 			console.log("user with identifier " + identifier + " and deviceId " + deviceId + " disconnected.");
 			if (typeof clients[identifier] !== "undefined") {
@@ -59,6 +87,7 @@ function init(server, app) {
 					delete clients[identifier];
 				}
 			}
+			socket.room = undefined;
 		});
 	});
 }
