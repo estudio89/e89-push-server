@@ -7,12 +7,12 @@ function init(server, app) {
 		var identifiers = req.body["identifiers"];
 		var notFound = [];
 		if (Object.prototype.toString.call( identifiers ) === '[object Array]') {
+			console.log("WEBSOCKET: [DATA RECEIVED] = " + JSON.stringify(req.body));
 
 			var eventType = req.body["type"];
 			delete req.body["identifiers"];
 			delete req.body["type"];
 
-			console.log("WEBSOCKET: [DATA RECEIVED] = " + JSON.stringify(req.body));
 			identifiers.forEach(function(identifier, idx){
 				var allSockets = clients[identifier];
 				if (typeof allSockets === "undefined") {
