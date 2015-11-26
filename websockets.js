@@ -34,6 +34,19 @@ function init(server, app) {
 		res.json({"notFound":notFound});
 	});
 
+	app.get('/push/list/ws/', function(req, res){
+		var listConnected = [];
+		var count = 0;
+		Object.keys(clients).forEach(function(key){
+			var connectedDevice = {};
+			connectedDevice[key] = Object.keys(clients[key]);
+			count += connectedDevice[key].length;
+			listConnected.push(connectedDevice);
+		});
+
+		res.json({"count":count, "devices":listConnected});
+	});
+
 	// Socket handling
 	io.on('connection', function(socket){
 		console.log('a user connected');

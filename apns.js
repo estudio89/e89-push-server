@@ -70,24 +70,27 @@ function init(app) {
 		    });
 
 		    // Notifying server
-		    var requestBody = JSON.stringify({"toDelete": toDelete});
+		    if (toDelete.length > 0) {
+			    var requestBody = JSON.stringify({"toDelete": toDelete});
 
-			var post_options = {
-				method: 'POST',
-			    headers: {
-			        'Content-Type': 'application/json',
-			        'Content-length': Buffer.byteLength(requestBody, 'utf8')
-			    },
-			    host:processResponse.host,
-			    path:processResponse.path,
-			    port:processResponse.port,
-			};
+				var post_options = {
+					method: 'POST',
+				    headers: {
+				        'Content-Type': 'application/json',
+				        'Content-length': Buffer.byteLength(requestBody, 'utf8')
+				    },
+				    host:processResponse.host,
+				    path:processResponse.path,
+				    port:processResponse.port,
+				};
 
 
-			var procReq = http.request(post_options);
+				var procReq = http.request(post_options);
 
-			procReq.write(requestBody);
-			procReq.end();
+				procReq.write(requestBody);
+				procReq.end();
+
+		    }
 
 		});
 	});
