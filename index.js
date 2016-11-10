@@ -6,7 +6,7 @@ var bodyParser = require('body-parser');
 
 // App initialization
 var app = express();
-var jsonParser = bodyParser.json();
+var jsonParser = bodyParser.json({limit: '50mb'});
 app.use(jsonParser);
 
 // Server initialization
