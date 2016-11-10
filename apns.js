@@ -2,10 +2,9 @@ function init(app) {
 	var apn = require('apn');
 	var websockets = require('./websockets.js');
 	var http = require('http');
-	var apnConnection;
-	var currentKeyFile;
-	var currentCertFile;
-	var feedback;
+
+	var apnConnectionCache = {};
+	var feedbackConnectionCache = {};
 
 	app.post("/push/send/apns/", function(req, res){
 		var identifiers = req.body.identifiers;
@@ -17,21 +16,15 @@ function init(app) {
 
 		// Setting timestamp
 		payload["timestamp"] = new Date().getTime();
-
 		console.log("APNS: [DATA RECEIVED] = " + JSON.stringify(req.body));
-
 		var notFound = websockets.sendToMobileDevice("ios", identifiers, payload);
 
-		if (keyFile !== currentKeyFile || certFile !== currentCertFile || typeof apnConnection === "undefined" || typeof feedback === "undefined") {
-			if (typeof apnConnection !== "undefined") {
-				apnConnection.shutdown();
-			}
-			currentCertFile = certFile;
-			currentKeyFile = keyFile;
-
+		var apnConnection = apnConnectionCache[certFile];
+		var feedback = feedbackConnectionCache[certFile];
+		if (typeof apnConnection === "undefined" || typeof feedback === "undefined") {
 			apnConnection = new apn.Connection({
-				"cert": currentCertFile,
-				"key": currentKeyFile,
+				"cert": certFile,
+				"key": keyFile,
 				"production": production
 			});
 
@@ -39,10 +32,46 @@ function init(app) {
 			feedback = new apn.Feedback({
 			    "batchFeedback": true,
 			    "interval": 300,
-			    "cert": currentCertFile,
-				"key": currentKeyFile,
+			    "cert": certFile,
+				"key": keyFile,
 				"production": production
 			});
+
+			// Feedback service
+			feedback.on("feedback", function(devices) {
+
+				var toDelete = [];
+			    devices.forEach(function(item) {
+			    	toDelete.push(item.device.token.toString("hex"));
+			    });
+
+			    // Notifying server
+			    if (toDelete.length > 0) {
+				    var requestBody = JSON.stringify({"toDelete": toDelete});
+
+					var post_options = {
+						method: 'POST',
+					    headers: {
+					        'Content-Type': 'application/json',
+					        'Content-length': Buffer.byteLength(requestBody, 'utf8')
+					    },
+					    host:processResponse.host,
+					    path:processResponse.path,
+					    port:processResponse.port,
+					};
+
+
+					var procReq = http.request(post_options);
+
+					procReq.write(requestBody);
+					procReq.end();
+
+			    }
+
+			});
+
+			apnConnectionCache[certFile] = apnConnection;
+			feedbackConnectionCache[certFile] = feedback;
 		}
 
 		// Receivers list
@@ -61,38 +90,6 @@ function init(app) {
 		apnConnection.pushNotification(note, devices);
 		res.json({ok:true});
 
-
-		// Feedback service
-		feedback.on("feedback", function(devices) {
-			var toDelete = [];
-		    devices.forEach(function(item) {
-		    	toDelete.push(item.device.token.toString("hex"));
-		    });
-
-		    // Notifying server
-		    if (toDelete.length > 0) {
-			    var requestBody = JSON.stringify({"toDelete": toDelete});
-
-				var post_options = {
-					method: 'POST',
-				    headers: {
-				        'Content-Type': 'application/json',
-				        'Content-length': Buffer.byteLength(requestBody, 'utf8')
-				    },
-				    host:processResponse.host,
-				    path:processResponse.path,
-				    port:processResponse.port,
-				};
-
-
-				var procReq = http.request(post_options);
-
-				procReq.write(requestBody);
-				procReq.end();
-
-		    }
-
-		});
 	});
 
 }
