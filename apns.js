@@ -36,6 +36,7 @@ function init(app) {
 				"key": keyFile,
 				"production": production
 			});
+			feedback.processResponse = processResponse;
 
 			// Feedback service
 			feedback.on("feedback", function(devices) {
@@ -55,9 +56,9 @@ function init(app) {
 					        'Content-Type': 'application/json',
 					        'Content-length': Buffer.byteLength(requestBody, 'utf8')
 					    },
-					    host:processResponse.host,
-					    path:processResponse.path,
-					    port:processResponse.port,
+					    host:feedback.processResponse.host,
+					    path:feedback.processResponse.path,
+					    port:feedback.processResponse.port,
 					};
 
 
