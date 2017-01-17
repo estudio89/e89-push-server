@@ -12,6 +12,7 @@ function init(server, app) {
 			var eventType = req.body["type"];
 			delete req.body["identifiers"];
 			delete req.body["type"];
+			req.body["timestamp"] = new Date().getTime() + "";
 
 			identifiers.forEach(function(identifier, idx){
 				var allSockets = clients[identifier];
