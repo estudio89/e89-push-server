@@ -1,7 +1,7 @@
 function init(app) {
 	var gcm = require('node-gcm');
 	var websockets = require('./websockets.js');
-	var http = require('http');
+	var http;
 
 	var sender;
 	var currentApiKey;
@@ -58,7 +58,7 @@ function init(app) {
 				    port:processResponse.port,
 				};
 
-
+				http = require(processResponse.port === '443' ? 'https' : 'http');
 				var procReq = http.request(post_options);
 
 				procReq.write(requestBody);
