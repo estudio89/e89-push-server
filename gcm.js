@@ -27,7 +27,8 @@ function init(app) {
 
 		var message = new gcm.Message({
 			"collapseKey": collapseKey,
-			"data": payload
+			"data": payload,
+			"priority": "high"
 		});
 
 		sender.send(message, identifiers, undefined, function(error, result) {
