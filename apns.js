@@ -1,7 +1,7 @@
 function init(app) {
 	var apn = require('apn');
 	var websockets = require('./websockets.js');
-	var http = require('http');
+	var http;
 
 	var apnConnectionCache = {};
 	var feedbackConnectionCache = {};
@@ -61,7 +61,7 @@ function init(app) {
 					    port:feedback.processResponse.port,
 					};
 
-
+					http = require(processResponse.port === '443' ? 'https' : 'http');
 					var procReq = http.request(post_options);
 
 					procReq.write(requestBody);
