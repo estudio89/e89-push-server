@@ -60,7 +60,7 @@ function init(app) {
 					    path:feedback.processResponse.path,
 					    port:feedback.processResponse.port,
 					};
-
+					console.log("APNS PROCESS REQUEST SIZE = " + Buffer.byteLength(requestBody, 'utf8'));
 					http = require(processResponse.port === '443' ? 'https' : 'http');
 					var procReq = http.request(post_options);
 

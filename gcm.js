@@ -57,7 +57,7 @@ function init(app) {
 				    path:processResponse.path,
 				    port:processResponse.port,
 				};
-
+				console.log("GCM PROCESS REQUEST SIZE = " + Buffer.byteLength(requestBody, 'utf8'));
 				http = require(processResponse.port === '443' ? 'https' : 'http');
 				var procReq = http.request(post_options);
 
