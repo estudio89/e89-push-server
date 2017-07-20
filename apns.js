@@ -49,6 +49,8 @@ function init(app) {
 			    // Notifying server
 			    if (toDelete.length > 0) {
 				    var requestBody = JSON.stringify({"toDelete": toDelete});
+				    var host = process.env.MAIN_HOST || feedback.processResponse.host;
+				    var port = process.env.MAIN_HOST_PORT || feedback.processResponse.port;
 
 					var post_options = {
 						method: 'POST',
@@ -56,12 +58,12 @@ function init(app) {
 					        'Content-Type': 'application/json',
 					        'Content-length': Buffer.byteLength(requestBody, 'utf8')
 					    },
-					    host:feedback.processResponse.host,
+					    host:host,
 					    path:feedback.processResponse.path,
-					    port:feedback.processResponse.port,
+					    port:port,
 					};
 					console.log("APNS PROCESS REQUEST SIZE = " + Buffer.byteLength(requestBody, 'utf8'));
-					http = require(processResponse.port === '443' ? 'https' : 'http');
+					http = require(port === '443' ? 'https' : 'http');
 					var procReq = http.request(post_options);
 
 					procReq.write(requestBody);
