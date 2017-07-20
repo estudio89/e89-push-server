@@ -2,7 +2,6 @@
   "apps":[
     {
       "name"        : "index",
-      "log_type"    : "json",
       "script"      : "index.js",
       "log_date_format" : "YYYY-MM-DD HH:mm Z"
     }
