@@ -3,7 +3,11 @@
     {
       "name"        : "index",
       "script"      : "index.js",
-      "log_date_format" : "YYYY-MM-DD HH:mm:ss.SSS Z"
+      "log_date_format" : "YYYY-MM-DD HH:mm:ss.SSS Z",
+      "env": {
+      	"MAIN_HOST": "127.0.0.1",
+      	"MAIN_HOST_PORT": "80"
+      }
     }
   ]
 }
