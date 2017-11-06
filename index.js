@@ -3,6 +3,8 @@ var VERSION = "1.0.18";
 // Requirements
 var express = require('express');
 var bodyParser = require('body-parser');
+var Raven = require('raven');
+Raven.config('https://f7b80b35d87c43aa8f610d52cefa3ec2:cdc5a817f2be49f0a97e41c30f6ed8d4@sentry.io/240765').install();
 
 // App initialization
 var app = express();
