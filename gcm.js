@@ -1,6 +1,7 @@
 function init(app) {
 	var gcm = require('node-gcm');
 	var websockets = require('./websockets.js');
+	var utils = require('./utils.js');
 	var http;
 
 	var sender;
@@ -31,12 +32,8 @@ function init(app) {
 			"priority": "high"
 		});
 
-		var step = 990;
-		var startSlice = 0;
-		var endSlice = step;
-
-		while (startSlice < identifiers.length) {
-			sender.send(message, identifiers.slice(startSlice, endSlice), undefined, function(error, result) {
+		function performSend(message, identifiers) {
+			sender.send(message, identifiers, undefined, function(error, result) {
 
 				// Checking if any registration ids were changed or removed
 				var toDelete = [];
@@ -74,11 +71,12 @@ function init(app) {
 				}
 
 			});
-			startSlice = endSlice;
-			endSlice += step;
+
+			console.log("GCM: sent push to " + identifiers);
 		}
 
-		console.log("GCM: sent push to " + identifiers);
+		utils.delayedSend("GCM", message, identifiers, performSend)
+
 		res.json({ok:true});
 	});
 }

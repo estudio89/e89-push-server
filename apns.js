@@ -1,6 +1,7 @@
 function init(app) {
 	var apn = require('apn');
 	var websockets = require('./websockets.js');
+	var utils = require('./utils.js');
 	var http;
 
 	var apnConnectionCache = {};
@@ -62,6 +63,7 @@ function init(app) {
 					    path:feedback.processResponse.path,
 					    port:port,
 					};
+					console.log("APNS: Will delete devices: " + toDelete);
 					console.log("APNS PROCESS REQUEST SIZE = " + Buffer.byteLength(requestBody, 'utf8'));
 					http = require(port === '443' ? 'https' : 'http');
 					var procReq = http.request(post_options);
@@ -77,11 +79,7 @@ function init(app) {
 			feedbackConnectionCache[certFile] = feedback;
 		}
 
-		// Receivers list
-		var devices = [];
-		identifiers.forEach(function(identifier){
-			devices.push(new apn.Device(identifier));
-		});
+
 
 		// Notification object
 		var note = new apn.Notification();
@@ -90,7 +88,21 @@ function init(app) {
 		["payload", "badge", "sound", "alert"].forEach(function(attr){
 			note[attr] = req.body[attr];
 		});
-		apnConnection.pushNotification(note, devices);
+
+		function performSend(notification, identifiers) {
+			// Receivers list
+			var devices = [];
+			identifiers.forEach(function(identifier){
+				devices.push(new apn.Device(identifier));
+			});
+
+			apnConnection.pushNotification(notification, devices);
+
+			console.log("APNS: [NOTIFIED] = " + identifiers);
+		}
+
+		utils.delayedSend("APNS", note, identifiers, performSend);
+
 		res.json({ok:true});
 
 	});
