@@ -1,10 +1,10 @@
 
 
 function delayedSend(sender, message, identifiers, sendFunction) {
-	var step = parseInt(process.env.SEND_STEP) || 1;
+	var step = parseInt(process.env.SEND_STEP) || 100;
 	var startSlice = 0;
 	var endSlice = step;
-	var delay = parseInt(process.env.SEND_DELAY) || 0;
+	var delay = parseInt(process.env.SEND_DELAY) || 3000;
 
 	var timeoutFunc = function() {
 		console.log("[" + sender + "]: " + "Sending to identifiers " + startSlice + " to " + endSlice)
