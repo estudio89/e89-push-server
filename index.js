@@ -8,11 +8,15 @@ Raven.config('https://f7b80b35d87c43aa8f610d52cefa3ec2:cdc5a817f2be49f0a97e41c30
 
 // App initialization
 var app = express();
+
 var jsonParser = bodyParser.json({limit: '50mb'});
 app.use(jsonParser);
 
 // Server initialization
 var server = require('http').Server(app);
+
+app.use(Raven.requestHandler());
+
 server.listen(8081, function(){
   console.log('listening on *:8081');
 });
@@ -27,3 +31,4 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
+app.use(Raven.errorHandler());
