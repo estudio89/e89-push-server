@@ -1,5 +1,6 @@
 function init(app) {
 	var apn = require('apn');
+	var Raven = require('raven');
 	var websockets = require('./websockets.js');
 	var utils = require('./utils.js');
 	var http;
@@ -93,7 +94,12 @@ function init(app) {
 			// Receivers list
 			var devices = [];
 			identifiers.forEach(function(identifier){
-				devices.push(new apn.Device(identifier));
+				try {
+					devices.push(new apn.Device(identifier));
+				} catch (err) {
+					Raven.captureException(new Error("Invalid APNS token: " + identifier));
+				}
+
 			});
 
 			apnConnection.pushNotification(notification, devices);
