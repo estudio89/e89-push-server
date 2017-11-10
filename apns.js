@@ -23,11 +23,15 @@ function init(app) {
 
 		var apnConnection = apnConnectionCache[certFile];
 		var feedback = feedbackConnectionCache[certFile];
-		if (typeof apnConnection === "undefined" || typeof feedback === "undefined") {
+		if ((typeof apnConnection === "undefined" || apnConnection.terminated) || typeof feedback === "undefined") {
 			apnConnection = new apn.Connection({
 				"cert": certFile,
 				"key": keyFile,
 				"production": production
+			});
+
+			apnConnection.on("transmissionError", function(error, notification, recipient) {
+				Raven.captureException(new Error("APNS transmission error. Code: " + error + " | Payload: " + JSON.stringify(notification.payload)));
 			});
 
 
