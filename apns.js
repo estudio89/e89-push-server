@@ -31,7 +31,7 @@ function init(app) {
 			});
 
 			apnConnection.on("transmissionError", function(error, notification, recipient) {
-				Raven.captureException(new Error("APNS transmission error. Code: " + error + " | Payload: " + JSON.stringify(notification.payload)));
+				Raven.captureException(new Error("APNS transmission error. Code: " + error + " | Payload: " + JSON.stringify(notification.payload) + " | Recipient: " + JSON.stringify(recipient)));
 			});
 
 
