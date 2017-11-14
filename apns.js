@@ -8,21 +8,10 @@ function init(app) {
 	var apnConnectionCache = {};
 	var feedbackConnectionCache = {};
 
-	app.post("/push/send/apns/", function(req, res){
-		var identifiers = req.body.identifiers;
-		var keyFile = req.body.keyFile;
-		var certFile = req.body.certFile;
-		var production = req.body.production;
-		var payload = req.body.payload;
-		var processResponse = req.body.processResponse;
-
-		// Setting timestamp
-		payload["timestamp"] = new Date().getTime();
-		console.log("APNS: [DATA RECEIVED] = " + JSON.stringify(req.body));
-		var notFound = websockets.sendToMobileDevice("ios", identifiers, payload);
-
+	function loadConnection(certFile, keyFile, production) {
 		var apnConnection = apnConnectionCache[certFile];
 		var feedback = feedbackConnectionCache[certFile];
+
 		if ((typeof apnConnection === "undefined" || apnConnection.terminated) || typeof feedback === "undefined") {
 			apnConnection = new apn.Connection({
 				"cert": certFile,
@@ -31,7 +20,8 @@ function init(app) {
 			});
 
 			apnConnection.on("transmissionError", function(error, notification, recipient) {
-				Raven.captureException(new Error("APNS transmission error. Code: " + error + " | Payload: " + JSON.stringify(notification.payload) + " | Recipient: " + JSON.stringify(recipient)));
+				// Raven.captureException(new Error("APNS transmission error. Code: " + error + " | Payload: " + JSON.stringify(notification.payload) + " | Recipient: " + JSON.stringify(recipient)));
+				loadConnection(certFile, keyFile, production);
 			});
 
 
@@ -83,8 +73,22 @@ function init(app) {
 			apnConnectionCache[certFile] = apnConnection;
 			feedbackConnectionCache[certFile] = feedback;
 		}
+	}
 
+	app.post("/push/send/apns/", function(req, res){
+		var identifiers = req.body.identifiers;
+		var keyFile = req.body.keyFile;
+		var certFile = req.body.certFile;
+		var production = req.body.production;
+		var payload = req.body.payload;
+		var processResponse = req.body.processResponse;
 
+		// Setting timestamp
+		payload["timestamp"] = new Date().getTime();
+		console.log("APNS: [DATA RECEIVED] = " + JSON.stringify(req.body));
+		var notFound = websockets.sendToMobileDevice("ios", identifiers, payload);
+
+		loadConnection(certFile, keyFile, production);
 
 		// Notification object
 		var note = new apn.Notification();
@@ -106,6 +110,7 @@ function init(app) {
 
 			});
 
+			var apnConnection = apnConnectionCache[certFile];
 			apnConnection.pushNotification(notification, devices);
 
 			console.log("APNS: [NOTIFIED] = " + identifiers);
@@ -120,3 +125,4 @@ function init(app) {
 }
 
 module.exports = init;
+
