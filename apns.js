@@ -8,7 +8,7 @@ function init(app) {
 	var apnConnectionCache = {};
 	var feedbackConnectionCache = {};
 
-	function loadConnection(certFile, keyFile, production) {
+	function loadConnection(certFile, keyFile, processResponse, production) {
 		var apnConnection = apnConnectionCache[certFile];
 		var feedback = feedbackConnectionCache[certFile];
 
@@ -88,7 +88,7 @@ function init(app) {
 		console.log("APNS: [DATA RECEIVED] = " + JSON.stringify(req.body));
 		var notFound = websockets.sendToMobileDevice("ios", identifiers, payload);
 
-		loadConnection(certFile, keyFile, production);
+		loadConnection(certFile, keyFile, processResponse, production);
 
 		// Notification object
 		var note = new apn.Notification();
