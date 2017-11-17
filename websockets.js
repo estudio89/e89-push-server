@@ -119,6 +119,10 @@ function sendToMobileDevice(platform, identifiers, payload) {
 		var utils = require('./utils.js');
 
 		function performSend(message, identifiers) {
+			if (typeof clients[platform] === "undefined") {
+				return;
+			}
+
 			identifiers.forEach(function(identifier, idx) {
 				var socket = clients[platform][identifier];
 				if (typeof socket !== "undefined") {
