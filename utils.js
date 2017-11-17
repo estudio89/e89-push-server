@@ -8,7 +8,14 @@ function delayedSend(sender, message, identifiers, sendFunction) {
 
 	var timeoutFunc = function() {
 		console.log("[" + sender + "]: " + "Sending to identifiers " + startSlice + " to " + endSlice)
-		sendFunction(message, identifiers.slice(startSlice, endSlice));
+		try {
+			sendFunction(message, identifiers.slice(startSlice, endSlice));
+		} catch (err) {
+			console.log("[" + sender + "]: Error when sending - " + err.message);
+			var Raven = require('raven');
+			Raven.captureException(err, {level: 'warning', extra: { sender: sender, identifiers: identifiers}});
+		}
+
 		startSlice = endSlice;
 		endSlice += step;
 
