@@ -13,6 +13,8 @@ function init(app) {
 		var collapseKey = req.body.collapseKey;
 		var payload = req.body.payload;
 		var processResponse = req.body.processResponse;
+		var title = req.body.title;
+		var description = req.body.description;
 
 		// Setting timestamp
 		payload["timestamp"] = new Date().getTime() + "";
@@ -26,11 +28,22 @@ function init(app) {
 			sender = new gcm.Sender(currentApiKey);
 		}
 
-		var message = new gcm.Message({
+		var messageData = {
 			"collapseKey": collapseKey,
-			"data": payload,
-			"priority": "high"
-		});
+			"priority": "high",
+			"click_action": 'FLUTTER_NOTIFICATION_CLICK'
+		};
+
+		messageData["data"] = payload;
+
+		if (!!title && !!description) {
+			messageData["notification"] = {
+				"title": title,
+				"body": description
+			};
+		}
+
+		var message = new gcm.Message(messageData);
 
 		function performSend(message, identifiers) {
 			sender.send(message, identifiers, undefined, function(error, result) {
